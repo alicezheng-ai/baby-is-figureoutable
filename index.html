@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Jujube Log</title>
+
+<!-- Home screen behavior (iOS) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jujube Log">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#10142a">
+
+<style>
+  :root{
+    --bg-top: #10142a;
+    --bg-bottom: #171d3a;
+    --surface: #1c2342;
+    --surface-line: #2b3260;
+    --accent: #c1683d;
+    --accent-soft: rgba(193,104,61,0.16);
+    --gold: #e8c170;
+    --gold-soft: rgba(232,193,112,0.14);
+    --text: #f1eae0;
+    --text-muted: #9aa1c4;
+    --text-faint: #6b7196;
+    --radius: 14px;
+  }
+
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body{
+    margin:0; padding:0; height:100%;
+    background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+  }
+
+  main{
+    width:100%;
+    max-width: 480px;
+    padding: max(24px, env(safe-area-inset-top)) 20px calc(32px + env(safe-area-inset-bottom));
+  }
+
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom: 22px;
+  }
+
+  header h1{
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin:0;
+  }
+
+  header .age{
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .setup-banner{
+    background: var(--gold-soft);
+    border: 1px solid rgba(232,193,112,0.35);
+    color: var(--gold);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    display:none;
+  }
+  .setup-banner.show{ display:block; }
+  .setup-banner code{
+    display:block;
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: var(--text);
+    word-break: break-all;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --- Now card: the one bold element on the page --- */
+  .now-card{
+    display:none;
+    background: linear-gradient(160deg, var(--accent-soft), transparent 70%), var(--surface);
+    border: 1px solid rgba(193,104,61,0.35);
+    border-radius: 18px;
+    padding: 22px 20px;
+    margin-bottom: 22px;
+  }
+  .now-card.show{ display:block; }
+
+  .now-label{
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .now-label b{ color: var(--gold); font-weight: 600; }
+
+  .now-timer{
+    font-size: 3rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    line-height:1.1;
+    margin: 4px 0 16px;
+  }
+
+  .now-sub{
+    font-size: 0.8rem;
+    color: var(--text-faint);
+    margin: -10px 0 16px;
+  }
+
+  .now-actions{
+    display:flex;
+    gap: 10px;
+  }
+
+  .btn{
+    appearance:none;
+    border:none;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor:pointer;
+    flex:1;
+  }
+  .btn-fill{ background: var(--accent); color: #1a1208; }
+  .btn-outline{ background: transparent; color: var(--gold); border: 1px solid rgba(232,193,112,0.4); }
+  .btn:active{ opacity:0.75; }
+
+  /* --- Idle action rows --- */
+  .panel{
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+
+  .row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 18px 18px;
+    border-bottom: 1px solid var(--surface-line);
+  }
+  .row:last-child{ border-bottom:none; }
+
+  .row-label{ font-size: 1.02rem; font-weight: 500; }
+  .row-hint{ font-size: 0.78rem; color: var(--text-faint); margin-top: 2px; }
+
+  .row-actions{ display:flex; gap:8px; }
+
+  .chip{
+    appearance:none;
+    border: 1px solid var(--surface-line);
+    background: rgba(255,255,255,0.02);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor:pointer;
+  }
+  .chip:active{ background: var(--accent-soft); border-color: var(--accent); }
+
+  /* --- Recent list --- */
+  .section-title{
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 0 10px 4px;
+  }
+
+  .entry{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--surface-line);
+  }
+  .entry:last-child{ border-bottom:none; }
+
+  .entry-main{ display:flex; align-items:center; gap:10px; }
+  .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .dot.sleep{ background: #7c8bd8; }
+  .dot.feed{ background: var(--gold); }
+  .dot.diaper{ background: var(--accent); }
+
+  .entry-text{ font-size: 0.92rem; }
+  .entry-detail{ font-size: 0.78rem; color: var(--text-faint); margin-top: 1px; }
+  .entry-time{ font-size: 0.8rem; color: var(--text-muted); white-space:nowrap; padding-left:10px; }
+
+  .empty{
+    padding: 22px 18px;
+    text-align:center;
+    color: var(--text-faint);
+    font-size: 0.88rem;
+  }
+
+  .sync-note{
+    text-align:center;
+    font-size: 0.75rem;
+    color: var(--text-faint);
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <h1>Jujube</h1>
+    <div class="age" id="age"></div>
+  </header>
+
+  <div class="setup-banner" id="setupBanner">
+    One-time setup: paste your Apps Script web app URL into <b>CONFIG.APPS_SCRIPT_URL</b> near the top of this file's script, then re-save it to your repo.
+    <code id="setupUrl"></code>
+  </div>
+
+  <!-- Now card: shown only while a timer is running -->
+  <div class="now-card" id="nowCard">
+    <div class="now-label" id="nowLabel"></div>
+    <div class="now-timer" id="nowTimer">0:00</div>
+    <div class="now-sub" id="nowSub"></div>
+    <div class="now-actions" id="nowActions"></div>
+  </div>
+
+  <!-- Idle actions -->
+  <div class="panel" id="idlePanel">
+    <div class="row" id="rowSleep">
+      <div>
+        <div class="row-label">Sleep</div>
+        <div class="row-hint">Tap to start timing</div>
+      </div>
+      <div class="row-actions">
+        <button class="chip" data-action="start-sleep">Start</button>
+      </div>
+    </div>
+
+    <div class="row" id="rowFeed">
+      <div>
+        <div class="row-label">Breastfeed</div>
+        <div class="row-hint">Choose a side to start</div>
+      </div>
+      <div class="row-actions">
+        <button class="chip" data-action="start-feed" data-side="LEFT">Left</button>
+        <button class="chip" data-action="start-feed" data-side="RIGHT">Right</button>
+      </div>
+    </div>
+
+    <div class="row" id="rowDiaper">
+      <div>
+        <div class="row-label">Diaper</div>
+        <div class="row-hint">One tap logs it</div>
+      </div>
+      <div class="row-actions">
+        <button class="chip" data-action="log-diaper" data-type="Wet">Wet</button>
+        <button class="chip" data-action="log-diaper" data-type="Dirty">Dirty</button>
+        <button class="chip" data-action="log-diaper" data-type="Dirty Wet">Both</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Recent</div>
+  <div class="panel" id="recentPanel">
+    <div class="empty" id="recentEmpty">Nothing logged yet.</div>
+  </div>
+
+  <div class="sync-note" id="syncNote"></div>
+
+</main>
+
+<script>
+(function(){
+
+  // ---------- Configuration ----------
+  const CONFIG = {
+    APPS_SCRIPT_URL: "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE",
+    PROFILE_NAME: "Jujube",
+    CAREGIVER: "Alice",
+    TIMEZONE: "America/Los_Angeles",
+    BIRTH_DATE: "2026-06-12" // YYYY-MM-DD
+  };
+
+  const configured = !CONFIG.APPS_SCRIPT_URL.startsWith("PASTE_");
+  if (!configured) {
+    document.getElementById('setupBanner').classList.add('show');
+    document.getElementById('setupUrl').textContent = "APPS_SCRIPT_URL = \"...\"";
+  }
+
+  // ---------- Storage keys ----------
+  const K_TIMER = 'jujube_active_timer';
+  const K_PENDING = 'jujube_pending_sync';
+  const K_CACHE = 'jujube_recent_cache';
+
+  // ---------- Helpers ----------
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+  function formatDateTime(ms){
+    const d = new Date(ms);
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' +
+           pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+
+  function formatElapsed(totalSeconds){
+    totalSeconds = Math.max(0, Math.floor(totalSeconds));
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    if (h > 0) return h + ':' + pad(m) + ':' + pad(s);
+    return m + ':' + pad(s);
+  }
+
+  function formatDuration(totalSeconds){
+    totalSeconds = Math.max(0, Math.floor(totalSeconds));
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    if (h > 0) return h + 'h ' + m + 'm';
+    if (m > 0) return m + 'm';
+    return totalSeconds + 's';
+  }
+
+  function formatRelative(ms){
+    const diff = Math.max(0, Date.now() - ms);
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    const hrs = Math.floor(mins / 60);
+    const remMins = mins % 60;
+    if (hrs < 24) return hrs + 'h ' + remMins + 'm ago';
+    const days = Math.floor(hrs / 24);
+    return days + 'd ago';
+  }
+
+  function computeAge(birthDateStr){
+    const birth = new Date(birthDateStr + 'T00:00:00');
+    const now = new Date();
+    let months = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+    let days = now.getDate() - birth.getDate();
+    if (days < 0){
+      months -= 1;
+      const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    if (months <= 0) return days + (days === 1 ? ' day old' : ' days old');
+    return months + (months === 1 ? ' mo ' : ' mo ') + days + 'd';
+  }
+
+  function uid(){
+    return 't-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  }
+
+  function getTimer(){
+    try { return JSON.parse(localStorage.getItem(K_TIMER)); } catch(e){ return null; }
+  }
+  function setTimer(t){
+    if (t) localStorage.setItem(K_TIMER, JSON.stringify(t));
+    else localStorage.removeItem(K_TIMER);
+  }
+
+  function getPending(){
+    try { return JSON.parse(localStorage.getItem(K_PENDING)) || []; } catch(e){ return []; }
+  }
+  function setPending(list){
+    localStorage.setItem(K_PENDING, JSON.stringify(list));
+  }
+
+  function getCache(){
+    try { return JSON.parse(localStorage.getItem(K_CACHE)) || []; } catch(e){ return []; }
+  }
+  function setCache(list){
+    localStorage.setItem(K_CACHE, JSON.stringify(list));
+  }
+
+  // ---------- Networking ----------
+  function submitEntry(payload){
+    // Optimistically show it, queue it, try to send, retry later if offline.
+    const cache = getCache();
+    cache.unshift(payload);
+    setCache(cache.slice(0, 30));
+    renderRecent();
+
+    const pending = getPending();
+    pending.push(payload);
+    setPending(pending);
+    flushPending();
+  }
+
+  function flushPending(){
+    if (!configured) { updateSyncNote(); return; }
+    const pending = getPending();
+    if (pending.length === 0) { updateSyncNote(); return; }
+
+    const [next, ...rest] = pending;
+    fetch(CONFIG.APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight on Apps Script
+      body: JSON.stringify(next)
+    }).then(r => r.json()).then(res => {
+      if (res && res.ok){
+        setPending(rest);
+        updateSyncNote();
+        if (rest.length > 0) flushPending();
+      } else {
+        updateSyncNote();
+      }
+    }).catch(() => {
+      updateSyncNote(); // stays queued, will retry on next load / online event
+    });
+  }
+
+  function updateSyncNote(){
+    const pending = getPending();
+    const el = document.getElementById('syncNote');
+    if (!configured){
+      el.textContent = '';
+    } else if (pending.length > 0){
+      el.textContent = pending.length + ' entr' + (pending.length === 1 ? 'y' : 'ies') + ' waiting to sync\u2026';
+    } else {
+      el.textContent = '';
+    }
+  }
+
+  function fetchRecent(){
+    if (!configured) return;
+    fetch(CONFIG.APPS_SCRIPT_URL + '?action=recent&limit=15')
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.ok){
+          setCache(res.entries);
+          renderRecent();
+        }
+      }).catch(() => { /* offline: keep showing cache */ });
+  }
+
+  // ---------- Rendering ----------
+  function renderAge(){
+    document.getElementById('age').textContent = computeAge(CONFIG.BIRTH_DATE);
+  }
+
+  function renderRecent(){
+    const cache = getCache();
+    const panel = document.getElementById('recentPanel');
+    if (cache.length === 0){
+      panel.innerHTML = '<div class="empty" id="recentEmpty">Nothing logged yet.</div>';
+      return;
+    }
+    panel.innerHTML = cache.map(entryRowHtml).join('');
+  }
+
+  function entryRowHtml(e){
+    const type = e['Type'];
+    let dotClass = 'diaper', text = type, detail = '';
+    const startMs = Number(e['Start Date/time (Epoch)']) || Date.parse(e['Start Date/time']);
+
+    if (type === 'Sleep'){
+      dotClass = 'sleep';
+      const secs = Number(e['[Sleep] Duration (Seconds)']) || 0;
+      text = 'Sleep';
+      detail = formatDuration(secs);
+    } else if (type === 'Breastfeed'){
+      dotClass = 'feed';
+      const l = Number(e['[Breastfeed] Left Duration (Seconds)']) || 0;
+      const r = Number(e['[Breastfeed] Right Duration (Seconds)']) || 0;
+      text = 'Breastfeed';
+      const parts = [];
+      if (l) parts.push('L ' + formatDuration(l));
+      if (r) parts.push('R ' + formatDuration(r));
+      detail = parts.join(' \u00b7 ');
+    } else if (type === 'Diaper'){
+      dotClass = 'diaper';
+      text = 'Diaper';
+      detail = e['[Diaper] Type'] || '';
+    }
+
+    return '<div class="entry">' +
+      '<div class="entry-main">' +
+        '<span class="dot ' + dotClass + '"></span>' +
+        '<div><div class="entry-text">' + text + '</div>' +
+        (detail ? '<div class="entry-detail">' + detail + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="entry-time">' + formatRelative(startMs) + '</div>' +
+    '</div>';
+  }
+
+  let tickHandle = null;
+
+  function renderNow(){
+    const timer = getTimer();
+    const nowCard = document.getElementById('nowCard');
+    const idlePanel = document.getElementById('idlePanel');
+
+    if (!timer){
+      nowCard.classList.remove('show');
+      idlePanel.style.display = '';
+      if (tickHandle) { clearInterval(tickHandle); tickHandle = null; }
+      return;
+    }
+
+    idlePanel.style.display = 'none';
+    nowCard.classList.add('show');
+
+    function tick(){
+      if (timer.type === 'Sleep'){
+        const elapsed = (Date.now() - timer.startedAt) / 1000;
+        document.getElementById('nowLabel').innerHTML = '<b>Sleep</b> \u00b7 running';
+        document.getElementById('nowTimer').textContent = formatElapsed(elapsed);
+        document.getElementById('nowSub').textContent = 'Started ' + formatRelative(timer.startedAt);
+        document.getElementById('nowActions').innerHTML =
+          '<button class="btn btn-fill" data-action="stop-sleep">Stop</button>';
+      } else if (timer.type === 'Breastfeed'){
+        const currentElapsed = (Date.now() - timer.currentSideStart) / 1000;
+        const liveLeft = timer.currentSide === 'LEFT' ? timer.leftSeconds + currentElapsed : timer.leftSeconds;
+        const liveRight = timer.currentSide === 'RIGHT' ? timer.rightSeconds + currentElapsed : timer.rightSeconds;
+        document.getElementById('nowLabel').innerHTML = '<b>Breastfeed</b> \u00b7 ' + timer.currentSide.toLowerCase();
+        document.getElementById('nowTimer').textContent = formatElapsed(currentElapsed);
+        document.getElementById('nowSub').textContent =
+          'L ' + formatDuration(liveLeft) + ' \u00b7 R ' + formatDuration(liveRight);
+        const otherSide = timer.currentSide === 'LEFT' ? 'RIGHT' : 'LEFT';
+        document.getElementById('nowActions').innerHTML =
+          '<button class="btn btn-outline" data-action="switch-side" data-side="' + otherSide + '">Switch to ' + otherSide.toLowerCase() + '</button>' +
+          '<button class="btn btn-fill" data-action="stop-feed">Stop</button>';
+      }
+    }
+
+    tick();
+    if (tickHandle) clearInterval(tickHandle);
+    tickHandle = setInterval(tick, 1000);
+  }
+
+  // ---------- Actions ----------
+  function startSleep(){
+    setTimer({ type: 'Sleep', startedAt: Date.now() });
+    renderNow();
+  }
+
+  function stopSleep(){
+    const timer = getTimer();
+    if (!timer) return;
+    const endedAt = Date.now();
+    submitEntry({
+      "Type": "Sleep",
+      "Profile Name": CONFIG.PROFILE_NAME,
+      "Start Date/time": formatDateTime(timer.startedAt),
+      "Start Date/time (Epoch)": timer.startedAt,
+      "Created By Caregiver": CONFIG.CAREGIVER,
+      "Last Updated By Caregiver": CONFIG.CAREGIVER,
+      "Time Zone": CONFIG.TIMEZONE,
+      "[Sleep] Duration (Seconds)": Math.round((endedAt - timer.startedAt) / 1000),
+      "[Sleep] End Date/time": formatDateTime(endedAt),
+      "[Sleep] End Date/time (Epoch)": endedAt,
+      "_familyKey": "local",
+      "_profileKey": "local",
+      "_activityKey": uid()
+    });
+    setTimer(null);
+    renderNow();
+  }
+
+  function startFeed(side){
+    setTimer({
+      type: 'Breastfeed',
+      startedAt: Date.now(),
+      beginSide: side,
+      currentSide: side,
+      currentSideStart: Date.now(),
+      leftSeconds: 0,
+      rightSeconds: 0
+    });
+    renderNow();
+  }
+
+  function switchSide(newSide){
+    const timer = getTimer();
+    if (!timer || timer.type !== 'Breastfeed') return;
+    const elapsed = (Date.now() - timer.currentSideStart) / 1000;
+    if (timer.currentSide === 'LEFT') timer.leftSeconds += elapsed;
+    else timer.rightSeconds += elapsed;
+    timer.currentSide = newSide;
+    timer.currentSideStart = Date.now();
+    setTimer(timer);
+    renderNow();
+  }
+
+  function stopFeed(){
+    const timer = getTimer();
+    if (!timer) return;
+    const elapsed = (Date.now() - timer.currentSideStart) / 1000;
+    if (timer.currentSide === 'LEFT') timer.leftSeconds += elapsed;
+    else timer.rightSeconds += elapsed;
+
+    submitEntry({
+      "Type": "Breastfeed",
+      "Profile Name": CONFIG.PROFILE_NAME,
+      "Start Date/time": formatDateTime(timer.startedAt),
+      "Start Date/time (Epoch)": timer.startedAt,
+      "Created By Caregiver": CONFIG.CAREGIVER,
+      "Last Updated By Caregiver": CONFIG.CAREGIVER,
+      "Time Zone": CONFIG.TIMEZONE,
+      "[Breastfeed] Begin Side": timer.beginSide,
+      "[Breastfeed] End Side": timer.currentSide,
+      "[Breastfeed] Left Duration (Seconds)": Math.round(timer.leftSeconds),
+      "[Breastfeed] Right Duration (Seconds)": Math.round(timer.rightSeconds),
+      "_familyKey": "local",
+      "_profileKey": "local",
+      "_activityKey": uid()
+    });
+    setTimer(null);
+    renderNow();
+  }
+
+  function logDiaper(type){
+    const now = Date.now();
+    submitEntry({
+      "Type": "Diaper",
+      "Profile Name": CONFIG.PROFILE_NAME,
+      "Start Date/time": formatDateTime(now),
+      "Start Date/time (Epoch)": now,
+      "Created By Caregiver": CONFIG.CAREGIVER,
+      "Last Updated By Caregiver": CONFIG.CAREGIVER,
+      "Time Zone": CONFIG.TIMEZONE,
+      "[Diaper] Type": type,
+      "_familyKey": "local",
+      "_profileKey": "local",
+      "_activityKey": uid()
+    });
+  }
+
+  // ---------- Event wiring ----------
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    if (action === 'start-sleep') startSleep();
+    else if (action === 'stop-sleep') stopSleep();
+    else if (action === 'start-feed') startFeed(btn.dataset.side);
+    else if (action === 'switch-side') switchSide(btn.dataset.side);
+    else if (action === 'stop-feed') stopFeed();
+    else if (action === 'log-diaper') logDiaper(btn.dataset.type);
+  });
+
+  window.addEventListener('online', flushPending);
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible'){
+      renderNow();
+      flushPending();
+      fetchRecent();
+    }
+  });
+
+  // ---------- Init ----------
+  renderAge();
+  renderRecent();
+  renderNow();
+  fetchRecent();
+  updateSyncNote();
+  flushPending();
+
+})();
+</script>
+</body>
+</html>
