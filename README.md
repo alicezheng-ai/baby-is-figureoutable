@@ -18,8 +18,10 @@ keeps working against it unchanged.
   start was earlier than when you opened the app
 - "Log manually" on Sleep and Breastfeed, for entries logged with no live timer at
   all (phone wasn't on hand)
-- Free-text notes on every entry
-- Tap any entry in Recent to edit or delete it
+- Stopping a Sleep or Breastfeed timer opens a quick review step — add a note if you
+  want one, then Save; nothing saves silently
+- Every entry in Recent has its own delete link; double-tap an entry to open it and
+  see or edit its note and details
 - Breastfeed shows which side was used last, so it's easy to rotate
 - Today / Last 24h rollup totals, rounded to the minute
 - Offline-safe: saves queue locally and retry on their own

@@ -216,6 +216,8 @@
   .entry-text{ font-size: 0.92rem; font-weight:600; }
   .entry-detail{ font-size: 0.78rem; color: var(--ink-faint); margin-top: 1px; }
   .entry-time{ font-size: 0.8rem; color: var(--ink-muted); white-space:nowrap; padding-left:10px; }
+  .entry-right{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; }
+  .entry-delete{ font-size: 0.7rem; padding:0; }
 
   .empty{ padding: 20px 16px; text-align:center; color: var(--ink-faint); font-size: 0.86rem; }
 
@@ -443,6 +445,12 @@
   // ---------- Rendering: rows ----------
   function renderRows(){ renderSleepRow(); renderFeedRow(); renderDiaperRow(); }
 
+  function formTag(d){
+    if (d.mode === 'edit') return '<span class="tag">edit</span>';
+    if (d.reviewing) return '<span class="tag">save</span>';
+    return '<span class="tag">manual</span>';
+  }
+
   function formActions(mode, saveLabel, saveDisabled){
     return '<div class="form-actions">' +
       (mode === 'edit' ? '<button class="link-btn danger" data-action="delete-entry">Delete</button>' : '<span></span>') +
@@ -486,7 +494,7 @@
 
   function renderSleepForm(d){
     return (
-      '<div class="row-label">Sleep' + (d.mode==='edit' ? '<span class="tag">edit</span>' : '<span class="tag">manual</span>') + '</div>' +
+      '<div class="row-label">Sleep' + formTag(d) + '</div>' +
       '<div class="form-grid">' +
         '<div class="form-field"><div class="form-label">Start</div><input type="datetime-local" class="time-input" style="width:100%" value="' + toLocalInputValue(d.startMs) + '" data-edit="startMs"></div>' +
         '<div class="form-field"><div class="form-label">End</div><input type="datetime-local" class="time-input" style="width:100%" value="' + toLocalInputValue(d.endMs) + '" data-edit="endMs"></div>' +
@@ -550,7 +558,7 @@
 
   function renderFeedForm(d){
     return (
-      '<div class="row-label">Breastfeed' + (d.mode==='edit' ? '<span class="tag">edit</span>' : '<span class="tag">manual</span>') + '</div>' +
+      '<div class="row-label">Breastfeed' + formTag(d) + '</div>' +
       '<div class="form-field"><div class="form-label">Start</div><input type="datetime-local" class="time-input" style="width:100%" value="' + toLocalInputValue(d.startMs) + '" data-edit="startMs"></div>' +
       '<div class="attr-group"><div class="attr-title">Began on</div><div class="chip-row">' + sideChip('beginSide','LEFT',d,'Left') + sideChip('beginSide','RIGHT',d,'Right') + '</div></div>' +
       '<div class="attr-group"><div class="attr-title">Ended on</div><div class="chip-row">' + sideChip('endSide','LEFT',d,'Left') + sideChip('endSide','RIGHT',d,'Right') + '</div></div>' +
@@ -574,7 +582,7 @@
 
   function renderDiaperForm(d){
     return (
-      '<div class="row-label">Diaper' + (d.mode==='edit' ? '<span class="tag">edit</span>' : '') + '</div>' +
+      '<div class="row-label">Diaper' + (d.mode==='edit' ? formTag(d) : '') + '</div>' +
       '<div class="form-field"><div class="form-label">Time</div><input type="datetime-local" class="time-input" style="width:100%" value="' + toLocalInputValue(d.startMs) + '" data-edit="startMs"></div>' +
       attrGroup('Type','diaperType',['Wet','Dirty','Dirty Wet'], d) +
       attrGroup('Color','color',['Yellow','Green','Brown','Black','Red'], d) +
@@ -640,12 +648,15 @@
     }
     if (e['Note']) detail = detail ? detail + ' \u00b7 ' + e['Note'] : e['Note'];
 
-    return '<div class="entry" data-action="edit-entry" data-key="' + key + '">' +
+    return '<div class="entry" data-key="' + key + '">' +
       '<div class="entry-main"><span class="dot ' + dotClass + '"></span>' +
       '<div><div class="entry-text">' + text + '</div>' +
       (detail ? '<div class="entry-detail">' + escapeHtml(detail) + '</div>' : '') +
       '</div></div>' +
-      '<div class="entry-time">' + formatRelative(startMs) + '</div>' +
+      '<div class="entry-right">' +
+        '<div class="entry-time">' + formatRelative(startMs) + '</div>' +
+        '<button class="link-btn danger entry-delete" data-action="quick-delete" data-key="' + key + '">delete</button>' +
+      '</div>' +
     '</div>';
   }
 
@@ -683,20 +694,11 @@
     var t = timers.Sleep;
     if (!t) return;
     var endedAt = Date.now();
-    var entry = {
-      "Type": "Sleep", "Profile Name": CONFIG.PROFILE_NAME,
-      "Start Date/time": formatDateTime(t.startedAt), "Start Date/time (Epoch)": t.startedAt,
-      "Created By Caregiver": CONFIG.CAREGIVER, "Last Updated By Caregiver": CONFIG.CAREGIVER,
-      "Time Zone": CONFIG.TIMEZONE, "Note": "",
-      "[Sleep] Duration (Seconds)": Math.round((endedAt - t.startedAt)/1000),
-      "[Sleep] End Date/time": formatDateTime(endedAt), "[Sleep] End Date/time (Epoch)": endedAt,
-      "_familyKey": "local", "_profileKey": "local", "_activityKey": uid()
-    };
-    addCacheEntry(entry);
-    queueOp(entry);
     timers.Sleep = null;
     setTimers(timers);
-    renderSleepRow(); renderRecent(); fetchSummary();
+    editing = { mode: 'new', reviewing: true, type: 'Sleep', activityKey: null,
+      startMs: t.startedAt, endMs: endedAt, note: '' };
+    renderRows();
   }
 
   function setSleepStartLive(value){
@@ -732,21 +734,12 @@
     if (!t) return;
     var elapsed = (Date.now() - t.currentSideStart)/1000;
     if (t.currentSide === 'LEFT') t.leftSeconds += elapsed; else t.rightSeconds += elapsed;
-    var entry = {
-      "Type": "Breastfeed", "Profile Name": CONFIG.PROFILE_NAME,
-      "Start Date/time": formatDateTime(t.startedAt), "Start Date/time (Epoch)": t.startedAt,
-      "Created By Caregiver": CONFIG.CAREGIVER, "Last Updated By Caregiver": CONFIG.CAREGIVER,
-      "Time Zone": CONFIG.TIMEZONE, "Note": "",
-      "[Breastfeed] Begin Side": t.beginSide, "[Breastfeed] End Side": t.currentSide,
-      "[Breastfeed] Left Duration (Seconds)": Math.round(t.leftSeconds),
-      "[Breastfeed] Right Duration (Seconds)": Math.round(t.rightSeconds),
-      "_familyKey": "local", "_profileKey": "local", "_activityKey": uid()
-    };
-    addCacheEntry(entry);
-    queueOp(entry);
     timers.Breastfeed = null;
     setTimers(timers);
-    renderFeedRow(); renderRecent(); fetchSummary();
+    editing = { mode: 'new', reviewing: true, type: 'Breastfeed', activityKey: null,
+      startMs: t.startedAt, beginSide: t.beginSide, endSide: t.currentSide,
+      leftMin: Math.round(t.leftSeconds/60), rightMin: Math.round(t.rightSeconds/60), note: '' };
+    renderRows();
   }
 
   function setFeedStartLive(value){
@@ -907,14 +900,27 @@
     else if (action === 'switch-side') switchSide(btn.dataset.side);
     else if (action === 'stop-feed') stopFeed();
     else if (action === 'open-new') openNew(btn.dataset.type);
-    else if (action === 'edit-entry'){
-      var key = btn.dataset.key;
-      var entry = getCache().filter(function(x){ return x['_activityKey']===key; })[0];
-      if (entry) openEdit(entry);
-    }
     else if (action === 'cancel-edit') cancelEdit();
     else if (action === 'save-entry') saveEntry();
     else if (action === 'delete-entry') deleteEntry();
+    else if (action === 'quick-delete'){
+      var qkey = btn.dataset.key;
+      if (confirm('Delete this entry?')){
+        queueOp({ _op: 'delete', _activityKey: qkey });
+        removeCacheEntry(qkey);
+        if (editing && editing.activityKey === qkey) editing = null;
+        renderRecent(); renderRows(); fetchSummary();
+      }
+    }
+  });
+
+  document.addEventListener('dblclick', function(e){
+    var row = e.target.closest('.entry');
+    if (!row) return;
+    var key = row.dataset.key;
+    if (!key) return;
+    var entry = getCache().filter(function(x){ return x['_activityKey']===key; })[0];
+    if (entry) openEdit(entry);
   });
 
   function onEditFieldChange(e){
