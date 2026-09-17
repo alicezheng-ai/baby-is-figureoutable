@@ -8,18 +8,35 @@ keeps working against it unchanged.
 **Live app:** https://alicezheng-ai.github.io/baby-is-figureoutable/
 (open it in Safari, then Share → Add to Home Screen)
 
+## What's here
+
+- Live start/stop timers for **Sleep** and **Breastfeed** (with one-tap side
+  switching), one-tap-start **Diaper** logging with Type / Color / Texture / Size
+- Every row stays visible and usable while a timer runs elsewhere — nothing takes
+  over the screen
+- A date/time picker on every timer and on Diaper, for backfilling when the actual
+  start was earlier than when you opened the app
+- "Log manually" on Sleep and Breastfeed, for entries logged with no live timer at
+  all (phone wasn't on hand)
+- Free-text notes on every entry
+- Tap any entry in Recent to edit or delete it
+- Breastfeed shows which side was used last, so it's easy to rotate
+- Today / Last 24h rollup totals, rounded to the minute
+- Offline-safe: saves queue locally and retry on their own
+- Installs to the home screen; light/dark follows the phone's system setting
+- Styled around the watercolor piece of Sai by the lake — same warm ivory paper and
+  soft palette throughout, light or dark
+
 ## Roadmap
 
-- [x] **Day 1 — Core logging.** Live start/stop timers for Sleep and Breastfeed (with
-  one-tap side switching), one-tap Diaper logging, offline-safe queuing so a save
-  never gets lost to a bad connection, home-screen install.
-- [ ] **Day 2 — Bath and Medicine.** Bath as a simple timestamped log; Medicine with a
-  dosing interval and a countdown to the next dose.
+- [x] **Day 1 — Core logging**, expanded with editing, notes, backfill, and a
+  Today/24h summary per the workflow details above.
+- [ ] **Day 2 — Bath and Medicine.** Bath as a simple timestamped log; Medicine with
+  a dosing interval and a countdown to the next dose.
 - [ ] **Day 3 — Action screen v1.** Rule-based "what's likely going on" reading —
   elapsed time since the last event, compared against Sai's own recent averages.
-  Ships before the Digital Twin model gets wired in.
-- [ ] **Day 4 — Sleep-trend flag.** A longer-horizon, week-over-week check for things
-  like reduced sleep, with AAP age-bracket context layered in.
+- [ ] **Day 4 — Sleep-trend flag.** A longer-horizon, week-over-week check for
+  things like reduced sleep, with AAP age-bracket context layered in.
 
 CSV export isn't a separate line item — the Google Sheet behind this app already uses
 Nara's exact header row, so `File > Download > CSV` on it is already a Nara-format
@@ -29,15 +46,16 @@ export, any time.
 `understand-infant-sleep` in as a view rather than a separate tool; multi-caregiver
 support, once family is around to use it in January.
 
-## Setup
+## Setup / updating
 
-1. **Backend:** new Google Sheet → Extensions → Apps Script → paste in `Code.gs` →
-   Deploy as a web app (Execute as Me, access Anyone) → copy the Web app URL.
-2. **Front end:** paste that URL into `CONFIG.APPS_SCRIPT_URL` near the top of
-   `index.html`.
-3. **Hosting:** this repo, with Pages turned on (Settings → Pages → main branch,
+1. **Backend:** Google Sheet → Extensions → Apps Script → paste in `apps-script/Code.gs`.
+   First time: Deploy → New deployment → Web app (Execute as Me, access Anyone),
+   copy the URL into `CONFIG.APPS_SCRIPT_URL` in `index.html`. Any time `Code.gs`
+   changes after that: Deploy → Manage deployments → edit → **New version** — saving
+   alone doesn't push changes live.
+2. **Front end:** this repo, with Pages turned on (Settings → Pages → main branch,
    root).
-4. **Home screen:** open the live link in Safari → Share → Add to Home Screen.
+3. **Home screen:** open the live link in Safari → Share → Add to Home Screen.
 
-Data lives in the `Log` tab of the Google Sheet from step 1 — one row per entry,
-headers matching the Nara export.
+Data lives in the `Log` tab of the Google Sheet — one row per entry, headers matching
+the Nara export, editable there directly if ever needed.

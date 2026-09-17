@@ -5,283 +5,250 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>Jujube Log</title>
 
-<!-- Home screen behavior (iOS) -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Jujube Log">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#10142a">
+<meta name="theme-color" content="#f6f1e6">
 
 <style>
   :root{
-    --bg-top: #10142a;
-    --bg-bottom: #171d3a;
-    --surface: #1c2342;
-    --surface-line: #2b3260;
-    --accent: #c1683d;
-    --accent-soft: rgba(193,104,61,0.16);
-    --gold: #e8c170;
-    --gold-soft: rgba(232,193,112,0.14);
-    --text: #f1eae0;
-    --text-muted: #9aa1c4;
-    --text-faint: #6b7196;
-    --radius: 14px;
+    --paper: #f6f1e6;
+    --paper-deep: #efe7d6;
+    --paper-line: #e3d9c4;
+    --ink: #4a4038;
+    --ink-muted: #8a7f6e;
+    --ink-faint: #b3a791;
+    --sage: #7f9a76;
+    --sage-soft: rgba(127,154,118,0.16);
+    --sky: #6f9cb3;
+    --sky-soft: rgba(111,156,179,0.16);
+    --coral: #c97a52;
+    --coral-soft: rgba(201,122,82,0.14);
+    --gold: #c39a4a;
+    --gold-soft: rgba(195,154,74,0.18);
+    --radius: 16px;
+    --shadow: 0 2px 10px rgba(74,64,56,0.08);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper: #262019;
+      --paper-deep: #322a22;
+      --paper-line: #43392d;
+      --ink: #ece1cf;
+      --ink-muted: #b3a791;
+      --ink-faint: #7d7264;
+      --sage: #93ac8a;
+      --sage-soft: rgba(147,172,138,0.18);
+      --sky: #8db4c4;
+      --sky-soft: rgba(141,180,196,0.18);
+      --coral: #d99268;
+      --coral-soft: rgba(217,146,104,0.18);
+      --gold: #d4b06c;
+      --gold-soft: rgba(212,176,108,0.2);
+      --shadow: 0 2px 14px rgba(0,0,0,0.35);
+    }
   }
 
   *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  html, body{
-    margin:0; padding:0; height:100%;
-    background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-    -webkit-font-smoothing: antialiased;
+  html{ background: var(--paper); position:relative; }
+  html::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity:0.035;
+    pointer-events:none;
+    mix-blend-mode: multiply;
+    z-index:0;
   }
 
   body{
-    min-height: 100vh;
-    display:flex;
-    justify-content:center;
+    margin:0; min-height:100vh;
+    display:flex; justify-content:center;
+    color: var(--ink);
+    font-family: ui-rounded, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    position:relative; z-index:1;
   }
 
-  main{
-    width:100%;
-    max-width: 480px;
-    padding: max(24px, env(safe-area-inset-top)) 20px calc(32px + env(safe-area-inset-bottom));
-  }
+  main{ width:100%; max-width: 480px; padding: 0 18px calc(32px + env(safe-area-inset-bottom)); }
 
-  header{
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    margin-bottom: 22px;
+  /* ---------- Hero ---------- */
+  .hero{ position:relative; margin: 0 -18px 18px; }
+  .hero-img{
+    width:100%; display:block;
+    aspect-ratio: 2.5 / 1;
+    object-fit: cover;
+    object-position: 50% 60%;
+    -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+    padding-top: env(safe-area-inset-top);
   }
+  .hero-caption{ text-align:center; margin-top:-14px; }
+  .hero-caption h1{
+    font-size: 1.7rem; font-weight: 700; letter-spacing: -0.01em; margin: 0;
+  }
+  .age{ font-size: 0.85rem; color: var(--ink-muted); margin-top: 2px; }
 
-  header h1{
-    font-size: 1.5rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    margin:0;
-  }
-
-  header .age{
-    font-size: 0.85rem;
-    color: var(--text-muted);
-  }
-
-  .setup-banner{
-    background: var(--gold-soft);
-    border: 1px solid rgba(232,193,112,0.35);
-    color: var(--gold);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    font-size: 0.85rem;
-    line-height: 1.5;
-    margin-bottom: 18px;
-    display:none;
-  }
-  .setup-banner.show{ display:block; }
-  .setup-banner code{
-    display:block;
-    margin-top: 6px;
-    font-size: 0.78rem;
-    color: var(--text);
-    word-break: break-all;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* --- Now card: the one bold element on the page --- */
-  .now-card{
-    display:none;
-    background: linear-gradient(160deg, var(--accent-soft), transparent 70%), var(--surface);
-    border: 1px solid rgba(193,104,61,0.35);
-    border-radius: 18px;
-    padding: 22px 20px;
-    margin-bottom: 22px;
-  }
-  .now-card.show{ display:block; }
-
-  .now-label{
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-  }
-  .now-label b{ color: var(--gold); font-weight: 600; }
-
-  .now-timer{
-    font-size: 3rem;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
-    line-height:1.1;
-    margin: 4px 0 16px;
-  }
-
-  .now-sub{
-    font-size: 0.8rem;
-    color: var(--text-faint);
-    margin: -10px 0 16px;
-  }
-
-  .now-actions{
-    display:flex;
-    gap: 10px;
-  }
-
-  .btn{
-    appearance:none;
-    border:none;
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor:pointer;
-    flex:1;
-  }
-  .btn-fill{ background: var(--accent); color: #1a1208; }
-  .btn-outline{ background: transparent; color: var(--gold); border: 1px solid rgba(232,193,112,0.4); }
-  .btn:active{ opacity:0.75; }
-
-  /* --- Idle action rows --- */
+  /* ---------- Panels & rows ---------- */
   .panel{
-    background: var(--surface);
+    background: var(--paper-deep);
+    border: 1px solid var(--paper-line);
     border-radius: var(--radius);
     overflow: hidden;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
   }
 
-  .row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding: 18px 18px;
-    border-bottom: 1px solid var(--surface-line);
-  }
+  .row{ padding: 16px 16px; border-bottom: 1px solid var(--paper-line); display:flex; align-items:center; justify-content:space-between; }
   .row:last-child{ border-bottom:none; }
+  .row.row-active{ display:block; }
 
-  .row-label{ font-size: 1.02rem; font-weight: 500; }
-  .row-hint{ font-size: 0.78rem; color: var(--text-faint); margin-top: 2px; }
+  .row-label{ font-size: 1.02rem; font-weight: 600; }
+  .row-hint{ font-size: 0.78rem; color: var(--ink-faint); margin-top: 2px; }
 
   .row-actions{ display:flex; gap:8px; }
+  .row-actions-col{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+
+  .tag{
+    display:inline-block; font-size:0.68rem; font-weight:700; text-transform:lowercase;
+    background: var(--paper); border:1px solid var(--paper-line); color: var(--ink-muted);
+    border-radius: 999px; padding: 2px 8px; margin-left:6px; vertical-align:middle;
+  }
 
   .chip{
-    appearance:none;
-    border: 1px solid var(--surface-line);
-    background: rgba(255,255,255,0.02);
-    color: var(--text);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor:pointer;
+    appearance:none; border: 1px solid var(--paper-line); background: var(--paper);
+    color: var(--ink); border-radius: 10px; padding: 10px 14px;
+    font-size: 0.88rem; font-weight: 600; font-family: inherit; cursor:pointer;
   }
-  .chip:active{ background: var(--accent-soft); border-color: var(--accent); }
+  .chip:active{ opacity:0.7; }
+  .chip-primary{ background: var(--sky); color: var(--paper); border-color: var(--sky); }
+  .chip-ghost{ background: transparent; font-size:1.1rem; padding: 8px 14px; }
+  .chip-suggested{ border-color: var(--gold); background: var(--gold-soft); }
+  .chip-select.selected{ background: var(--coral); color: var(--paper); border-color: var(--coral); }
 
-  /* --- Recent list --- */
-  .section-title{
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin: 0 0 10px 4px;
+  .link-btn{
+    appearance:none; border:none; background:none; color: var(--ink-muted);
+    font-size: 0.78rem; font-family: inherit; text-decoration: underline;
+    padding: 2px; cursor:pointer;
+  }
+  .link-btn.danger{ color: var(--coral); }
+
+  /* ---------- Active / running / form state ---------- */
+  .row-active-sky{ background: linear-gradient(160deg, var(--sky-soft), transparent 75%); }
+  .row-active-gold{ background: linear-gradient(160deg, var(--gold-soft), transparent 75%); }
+  .row-active-coral{ background: linear-gradient(160deg, var(--coral-soft), transparent 75%); }
+
+  .row-active-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+
+  .row-timer{
+    font-size: 2.5rem; font-weight: 700; font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em; line-height:1.1; margin: 2px 0 10px;
+  }
+  .row-sub{ font-size: 0.8rem; color: var(--ink-muted); margin: -6px 0 12px; }
+
+  .row-active-actions{ display:flex; gap:10px; margin-top: 10px; }
+
+  .btn{
+    appearance:none; border:none; border-radius: 12px; padding: 13px 16px;
+    font-size: 0.92rem; font-weight: 700; font-family: inherit; cursor:pointer; flex:1;
+  }
+  .btn-fill{ background: var(--ink); color: var(--paper); }
+  .btn-outline{ background: transparent; color: var(--ink); border: 1px solid var(--paper-line); }
+  .btn:active{ opacity:0.75; }
+  .btn:disabled{ opacity:0.4; }
+
+  .time-input{
+    font-family: inherit; font-size: 0.76rem; color: var(--ink-muted);
+    background: var(--paper); border: 1px solid var(--paper-line); border-radius: 8px;
+    padding: 4px 6px;
   }
 
-  .entry{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding: 13px 18px;
-    border-bottom: 1px solid var(--surface-line);
+  /* ---------- Attribute groups (diaper / sides) ---------- */
+  .attr-group{ margin: 10px 0; }
+  .attr-title{ font-size: 0.72rem; color: var(--ink-faint); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+
+  .form-grid{ display:flex; gap:10px; margin: 10px 0; }
+  .form-field{ flex:1; }
+  .form-field.full{ flex-basis:100%; }
+  .form-label{ font-size: 0.72rem; color: var(--ink-faint); margin-bottom: 4px; }
+  .note-input{
+    width:100%; font-family: inherit; font-size: 0.88rem; color: var(--ink);
+    background: var(--paper); border: 1px solid var(--paper-line); border-radius: 8px;
+    padding: 8px 10px;
   }
+
+  .form-actions{ display:flex; align-items:center; justify-content:space-between; margin-top: 12px; gap:10px; }
+  .form-actions-right{ display:flex; align-items:center; gap:14px; }
+  .form-actions-right .btn{ flex: none; padding: 10px 18px; }
+
+  /* ---------- Summary ---------- */
+  .summary-tabs{ display:flex; border-bottom: 1px solid var(--paper-line); }
+  .tab-btn{
+    flex:1; appearance:none; border:none; background:none; font-family:inherit;
+    color: var(--ink-faint); font-size: 0.84rem; font-weight:700; padding: 12px 0; cursor:pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .tab-btn.active{ color: var(--ink); border-bottom-color: var(--coral); }
+  .summary-body{ padding: 4px 0; }
+  .summary-row{ display:flex; align-items:center; padding: 12px 16px; border-bottom: 1px solid var(--paper-line); }
+  .summary-row:last-child{ border-bottom:none; }
+
+  /* ---------- Recent list ---------- */
+  .section-title{ font-size: 0.85rem; color: var(--ink-muted); margin: 0 0 10px 4px; }
+
+  .entry{ display:flex; justify-content:space-between; align-items:center; padding: 13px 16px; border-bottom: 1px solid var(--paper-line); cursor:pointer; }
   .entry:last-child{ border-bottom:none; }
+  .entry:active{ background: var(--paper-line); }
+  .entry-editing{ display:block; padding: 14px 16px; cursor:default; }
+  .entry-editing:active{ background:none; }
 
   .entry-main{ display:flex; align-items:center; gap:10px; }
   .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .dot.sleep{ background: #7c8bd8; }
+  .dot.sleep{ background: var(--sky); }
   .dot.feed{ background: var(--gold); }
-  .dot.diaper{ background: var(--accent); }
+  .dot.diaper{ background: var(--coral); }
 
-  .entry-text{ font-size: 0.92rem; }
-  .entry-detail{ font-size: 0.78rem; color: var(--text-faint); margin-top: 1px; }
-  .entry-time{ font-size: 0.8rem; color: var(--text-muted); white-space:nowrap; padding-left:10px; }
+  .entry-text{ font-size: 0.92rem; font-weight:600; }
+  .entry-detail{ font-size: 0.78rem; color: var(--ink-faint); margin-top: 1px; }
+  .entry-time{ font-size: 0.8rem; color: var(--ink-muted); white-space:nowrap; padding-left:10px; }
 
-  .empty{
-    padding: 22px 18px;
-    text-align:center;
-    color: var(--text-faint);
-    font-size: 0.88rem;
-  }
+  .empty{ padding: 20px 16px; text-align:center; color: var(--ink-faint); font-size: 0.86rem; }
 
-  .sync-note{
-    text-align:center;
-    font-size: 0.75rem;
-    color: var(--text-faint);
-    margin-top: 16px;
-  }
+  .sync-note{ text-align:center; font-size: 0.75rem; color: var(--ink-faint); margin-top: 14px; }
 </style>
 </head>
 <body>
 <main>
 
-  <header>
-    <h1>Jujube</h1>
-    <div class="age" id="age"></div>
+  <header class="hero">
+    <img src="hero.jpg" class="hero-img" alt="">
+    <div class="hero-caption">
+      <h1>Jujube</h1>
+      <div class="age" id="age"></div>
+    </div>
   </header>
 
-  <div class="setup-banner" id="setupBanner">
-    One-time setup: paste your Apps Script web app URL into <b>CONFIG.APPS_SCRIPT_URL</b> near the top of this file's script, then re-save it to your repo.
-    <code id="setupUrl"></code>
+  <div class="panel" id="panelActions">
+    <div class="row" id="rowSleep"></div>
+    <div class="row" id="rowFeed"></div>
+    <div class="row" id="rowDiaper"></div>
   </div>
 
-  <!-- Now card: shown only while a timer is running -->
-  <div class="now-card" id="nowCard">
-    <div class="now-label" id="nowLabel"></div>
-    <div class="now-timer" id="nowTimer">0:00</div>
-    <div class="now-sub" id="nowSub"></div>
-    <div class="now-actions" id="nowActions"></div>
-  </div>
-
-  <!-- Idle actions -->
-  <div class="panel" id="idlePanel">
-    <div class="row" id="rowSleep">
-      <div>
-        <div class="row-label">Sleep</div>
-        <div class="row-hint">Tap to start timing</div>
-      </div>
-      <div class="row-actions">
-        <button class="chip" data-action="start-sleep">Start</button>
-      </div>
+  <div class="panel">
+    <div class="summary-tabs">
+      <button class="tab-btn active" data-range="today">Today</button>
+      <button class="tab-btn" data-range="24h">Last 24h</button>
     </div>
-
-    <div class="row" id="rowFeed">
-      <div>
-        <div class="row-label">Breastfeed</div>
-        <div class="row-hint">Choose a side to start</div>
-      </div>
-      <div class="row-actions">
-        <button class="chip" data-action="start-feed" data-side="LEFT">Left</button>
-        <button class="chip" data-action="start-feed" data-side="RIGHT">Right</button>
-      </div>
-    </div>
-
-    <div class="row" id="rowDiaper">
-      <div>
-        <div class="row-label">Diaper</div>
-        <div class="row-hint">One tap logs it</div>
-      </div>
-      <div class="row-actions">
-        <button class="chip" data-action="log-diaper" data-type="Wet">Wet</button>
-        <button class="chip" data-action="log-diaper" data-type="Dirty">Dirty</button>
-        <button class="chip" data-action="log-diaper" data-type="Dirty Wet">Both</button>
-      </div>
-    </div>
+    <div class="summary-body" id="summaryBody"></div>
   </div>
 
   <div class="section-title">Recent</div>
-  <div class="panel" id="recentPanel">
-    <div class="empty" id="recentEmpty">Nothing logged yet.</div>
-  </div>
+  <div class="panel" id="recentPanel"></div>
 
   <div class="sync-note" id="syncNote"></div>
 
@@ -291,129 +258,151 @@
 (function(){
 
   // ---------- Configuration ----------
-  const CONFIG = {
+  var CONFIG = {
     APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxz-G6Mxu6IMxsnKE3noswcClorYMylOqrG6sFveYlcJNs0K4wx4EsFz_tEWwq1iNFD/exec",
     PROFILE_NAME: "Jujube",
     CAREGIVER: "Alice",
     TIMEZONE: "America/Los_Angeles",
-    BIRTH_DATE: "2026-06-12" // YYYY-MM-DD
+    BIRTH_DATE: "2026-06-12"
   };
-
-  const configured = !CONFIG.APPS_SCRIPT_URL.startsWith("PASTE_");
-  if (!configured) {
-    document.getElementById('setupBanner').classList.add('show');
-    document.getElementById('setupUrl').textContent = "APPS_SCRIPT_URL = \"...\"";
-  }
+  var configured = !CONFIG.APPS_SCRIPT_URL.startsWith("PASTE_");
 
   // ---------- Storage keys ----------
-  const K_TIMER = 'jujube_active_timer';
-  const K_PENDING = 'jujube_pending_sync';
-  const K_CACHE = 'jujube_recent_cache';
+  var K_TIMERS = 'jujube_timers_v2';
+  var K_PENDING = 'jujube_pending_sync';
+  var K_CACHE = 'jujube_recent_cache';
+
+  // ---------- Transient UI state ----------
+  var editing = null; // { mode:'new'|'edit', type, activityKey, startMs, endMs, beginSide, endSide, leftMin, rightMin, diaperType, color, texture, size, note }
+  var currentSummaryRange = 'today';
 
   // ---------- Helpers ----------
   function pad(n){ return n < 10 ? '0' + n : '' + n; }
 
   function formatDateTime(ms){
-    const d = new Date(ms);
+    var d = new Date(ms);
     return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' +
            pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
   }
 
+  function toLocalInputValue(ms){
+    var d = new Date(ms);
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  function fromLocalInputValue(str){
+    var parts = str.split('T');
+    var dateParts = parts[0].split('-').map(Number);
+    var timeParts = (parts[1]||'00:00').split(':').map(Number);
+    return new Date(dateParts[0], dateParts[1]-1, dateParts[2], timeParts[0], timeParts[1], 0).getTime();
+  }
+
   function formatElapsed(totalSeconds){
     totalSeconds = Math.max(0, Math.floor(totalSeconds));
-    const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
-    const s = totalSeconds % 60;
+    var h = Math.floor(totalSeconds / 3600);
+    var m = Math.floor((totalSeconds % 3600) / 60);
+    var s = totalSeconds % 60;
     if (h > 0) return h + ':' + pad(m) + ':' + pad(s);
     return m + ':' + pad(s);
   }
 
   function formatDuration(totalSeconds){
-    totalSeconds = Math.max(0, Math.floor(totalSeconds));
-    const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
+    totalSeconds = Math.max(0, Math.round(totalSeconds));
+    var h = Math.floor(totalSeconds / 3600);
+    var m = Math.round((totalSeconds % 3600) / 60);
     if (h > 0) return h + 'h ' + m + 'm';
-    if (m > 0) return m + 'm';
+    if (totalSeconds >= 60) return m + 'm';
     return totalSeconds + 's';
   }
 
   function formatRelative(ms){
-    const diff = Math.max(0, Date.now() - ms);
-    const mins = Math.floor(diff / 60000);
+    var diff = Math.max(0, Date.now() - ms);
+    var mins = Math.floor(diff / 60000);
     if (mins < 1) return 'just now';
     if (mins < 60) return mins + 'm ago';
-    const hrs = Math.floor(mins / 60);
-    const remMins = mins % 60;
+    var hrs = Math.floor(mins / 60);
+    var remMins = mins % 60;
     if (hrs < 24) return hrs + 'h ' + remMins + 'm ago';
-    const days = Math.floor(hrs / 24);
+    var days = Math.floor(hrs / 24);
     return days + 'd ago';
   }
 
   function computeAge(birthDateStr){
-    const birth = new Date(birthDateStr + 'T00:00:00');
-    const now = new Date();
-    let months = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
-    let days = now.getDate() - birth.getDate();
+    var birth = new Date(birthDateStr + 'T00:00:00');
+    var now = new Date();
+    var months = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+    var days = now.getDate() - birth.getDate();
     if (days < 0){
       months -= 1;
-      const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      var prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
       days += prevMonth.getDate();
     }
     if (months <= 0) return days + (days === 1 ? ' day old' : ' days old');
-    return months + (months === 1 ? ' mo ' : ' mo ') + days + 'd';
+    return months + ' mo ' + days + 'd';
   }
 
   function uid(){
     return 't-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
   }
 
-  function getTimer(){
-    try { return JSON.parse(localStorage.getItem(K_TIMER)); } catch(e){ return null; }
-  }
-  function setTimer(t){
-    if (t) localStorage.setItem(K_TIMER, JSON.stringify(t));
-    else localStorage.removeItem(K_TIMER);
+  function escapeHtml(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  function getPending(){
-    try { return JSON.parse(localStorage.getItem(K_PENDING)) || []; } catch(e){ return []; }
-  }
-  function setPending(list){
-    localStorage.setItem(K_PENDING, JSON.stringify(list));
-  }
+  // ---------- Local storage state ----------
+  function getTimers(){ try { return JSON.parse(localStorage.getItem(K_TIMERS)) || {}; } catch(e){ return {}; } }
+  function setTimers(t){ localStorage.setItem(K_TIMERS, JSON.stringify(t)); }
 
-  function getCache(){
-    try { return JSON.parse(localStorage.getItem(K_CACHE)) || []; } catch(e){ return []; }
+  function getPending(){ try { return JSON.parse(localStorage.getItem(K_PENDING)) || []; } catch(e){ return []; } }
+  function setPending(list){ localStorage.setItem(K_PENDING, JSON.stringify(list)); }
+
+  function getCache(){ try { return JSON.parse(localStorage.getItem(K_CACHE)) || []; } catch(e){ return []; } }
+  function setCache(list){ localStorage.setItem(K_CACHE, JSON.stringify(list)); }
+
+  function addCacheEntry(entry){
+    var cache = getCache();
+    cache.unshift(entry);
+    setCache(cache.slice(0, 30));
   }
-  function setCache(list){
-    localStorage.setItem(K_CACHE, JSON.stringify(list));
+  function updateCacheEntry(key, entry){
+    var cache = getCache();
+    for (var i=0;i<cache.length;i++){
+      if (cache[i]['_activityKey'] === key){ cache[i] = Object.assign({}, cache[i], entry); break; }
+    }
+    setCache(cache);
+  }
+  function removeCacheEntry(key){
+    setCache(getCache().filter(function(e){ return e['_activityKey'] !== key; }));
+  }
+  function getLastFeedSide(){
+    var cache = getCache();
+    for (var i=0;i<cache.length;i++){
+      if (cache[i]['Type'] === 'Breastfeed'){
+        return cache[i]['[Breastfeed] End Side'] || cache[i]['[Breastfeed] Begin Side'] || null;
+      }
+    }
+    return null;
   }
 
   // ---------- Networking ----------
-  function submitEntry(payload){
-    // Optimistically show it, queue it, try to send, retry later if offline.
-    const cache = getCache();
-    cache.unshift(payload);
-    setCache(cache.slice(0, 30));
-    renderRecent();
-
-    const pending = getPending();
+  function queueOp(payload){
+    var pending = getPending();
     pending.push(payload);
     setPending(pending);
     flushPending();
   }
 
   function flushPending(){
-    if (!configured) { updateSyncNote(); return; }
-    const pending = getPending();
+    if (!configured) return;
+    var pending = getPending();
     if (pending.length === 0) { updateSyncNote(); return; }
-
-    const [next, ...rest] = pending;
+    var next = pending[0];
+    var rest = pending.slice(1);
     fetch(CONFIG.APPS_SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight on Apps Script
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(next)
-    }).then(r => r.json()).then(res => {
+    }).then(function(r){ return r.json(); }).then(function(res){
       if (res && res.ok){
         setPending(rest);
         updateSyncNote();
@@ -421,258 +410,546 @@
       } else {
         updateSyncNote();
       }
-    }).catch(() => {
-      updateSyncNote(); // stays queued, will retry on next load / online event
-    });
+    }).catch(function(){ updateSyncNote(); });
   }
 
   function updateSyncNote(){
-    const pending = getPending();
-    const el = document.getElementById('syncNote');
-    if (!configured){
-      el.textContent = '';
-    } else if (pending.length > 0){
-      el.textContent = pending.length + ' entr' + (pending.length === 1 ? 'y' : 'ies') + ' waiting to sync\u2026';
-    } else {
-      el.textContent = '';
-    }
+    var pending = getPending();
+    var el = document.getElementById('syncNote');
+    if (!configured || pending.length === 0){ el.textContent = ''; }
+    else { el.textContent = pending.length + ' entr' + (pending.length === 1 ? 'y' : 'ies') + ' waiting to sync\u2026'; }
   }
 
   function fetchRecent(){
     if (!configured) return;
-    fetch(CONFIG.APPS_SCRIPT_URL + '?action=recent&limit=15')
-      .then(r => r.json())
-      .then(res => {
+    fetch(CONFIG.APPS_SCRIPT_URL + '?action=recent&limit=20')
+      .then(function(r){ return r.json(); })
+      .then(function(res){ if (res && res.ok){ setCache(res.entries); renderRecent(); renderRows(); } })
+      .catch(function(){});
+  }
+
+  function fetchSummary(){
+    if (!configured) return;
+    fetch(CONFIG.APPS_SCRIPT_URL + '?action=summary&range=' + currentSummaryRange)
+      .then(function(r){ return r.json(); })
+      .then(function(res){
         if (res && res.ok){
-          setCache(res.entries);
-          renderRecent();
+          localStorage.setItem('jujube_summary_' + currentSummaryRange, JSON.stringify(res.summary));
+          renderSummary(res.summary);
         }
-      }).catch(() => { /* offline: keep showing cache */ });
+      }).catch(function(){});
   }
 
-  // ---------- Rendering ----------
-  function renderAge(){
-    document.getElementById('age').textContent = computeAge(CONFIG.BIRTH_DATE);
+  // ---------- Rendering: rows ----------
+  function renderRows(){ renderSleepRow(); renderFeedRow(); renderDiaperRow(); }
+
+  function formActions(mode, saveLabel, saveDisabled){
+    return '<div class="form-actions">' +
+      (mode === 'edit' ? '<button class="link-btn danger" data-action="delete-entry">Delete</button>' : '<span></span>') +
+      '<div class="form-actions-right">' +
+        '<button class="link-btn" data-action="cancel-edit">Cancel</button>' +
+        '<button class="btn btn-fill" data-action="save-entry"' + (saveDisabled ? ' disabled' : '') + '>' + (saveLabel||'Save') + '</button>' +
+      '</div>' +
+    '</div>';
   }
 
-  function renderRecent(){
-    const cache = getCache();
-    const panel = document.getElementById('recentPanel');
-    if (cache.length === 0){
-      panel.innerHTML = '<div class="empty" id="recentEmpty">Nothing logged yet.</div>';
+  function renderSleepRow(){
+    var el = document.getElementById('rowSleep');
+    var t = getTimers().Sleep;
+
+    if (t){
+      el.className = 'row row-active row-active-sky';
+      el.innerHTML =
+        '<div class="row-active-top">' +
+          '<div class="row-label">Sleep<span class="tag">running</span></div>' +
+          '<input type="datetime-local" class="time-input" value="' + toLocalInputValue(t.startedAt) + '" data-edit-live="sleep-start">' +
+        '</div>' +
+        '<div class="row-timer" id="sleepTimerText">' + formatElapsed((Date.now()-t.startedAt)/1000) + '</div>' +
+        '<div class="row-active-actions"><button class="btn btn-fill" data-action="stop-sleep">Stop</button></div>';
       return;
     }
+
+    if (editing && editing.mode === 'new' && editing.type === 'Sleep'){
+      el.className = 'row row-active row-active-sky';
+      el.innerHTML = renderSleepForm(editing);
+      return;
+    }
+
+    el.className = 'row';
+    el.innerHTML =
+      '<div><div class="row-label">Sleep</div><div class="row-hint">Tap to start timing</div></div>' +
+      '<div class="row-actions-col">' +
+        '<button class="chip chip-primary" data-action="start-sleep">Start</button>' +
+        '<button class="link-btn" data-action="open-new" data-type="Sleep">log manually</button>' +
+      '</div>';
+  }
+
+  function renderSleepForm(d){
+    return (
+      '<div class="row-label">Sleep' + (d.mode==='edit' ? '<span class="tag">edit</span>' : '<span class="tag">manual</span>') + '</div>' +
+      '<div class="form-grid">' +
+        '<div class="form-field"><div class="form-label">Start</div><input type="datetime-local" class="time-input" style="width:100%" value="' + toLocalInputValue(d.startMs) + '" data-edit="startMs"></div>' +
+        '<div class="form-field"><div class="form-label">End</div><input type="datetime-local" class="time-input" style="width:100%" value="' + toLocalInputValue(d.endMs) + '" data-edit="endMs"></div>' +
+      '</div>' +
+      '<div class="form-field full"><div class="form-label">Note</div><input type="text" class="note-input" placeholder="optional" value="' + escapeHtml(d.note||'') + '" data-edit="note"></div>' +
+      formActions(d.mode)
+    );
+  }
+
+  function feedSubLabel(t){
+    var currentElapsed = (Date.now() - t.currentSideStart)/1000;
+    var liveLeft = t.currentSide === 'LEFT' ? t.leftSeconds + currentElapsed : t.leftSeconds;
+    var liveRight = t.currentSide === 'RIGHT' ? t.rightSeconds + currentElapsed : t.rightSeconds;
+    return 'L ' + formatDuration(liveLeft) + ' \u00b7 R ' + formatDuration(liveRight);
+  }
+
+  function renderFeedRow(){
+    var el = document.getElementById('rowFeed');
+    var t = getTimers().Breastfeed;
+
+    if (t){
+      var other = t.currentSide === 'LEFT' ? 'RIGHT' : 'LEFT';
+      el.className = 'row row-active row-active-gold';
+      el.innerHTML =
+        '<div class="row-active-top">' +
+          '<div class="row-label">Breastfeed<span class="tag">' + t.currentSide.toLowerCase() + '</span></div>' +
+          '<input type="datetime-local" class="time-input" value="' + toLocalInputValue(t.startedAt) + '" data-edit-live="feed-start">' +
+        '</div>' +
+        '<div class="row-timer" id="feedTimerText">' + formatElapsed((Date.now()-t.currentSideStart)/1000) + '</div>' +
+        '<div class="row-sub" id="feedSubText">' + feedSubLabel(t) + '</div>' +
+        '<div class="row-active-actions">' +
+          '<button class="btn btn-outline" data-action="switch-side" data-side="' + other + '">Switch to ' + other.toLowerCase() + '</button>' +
+          '<button class="btn btn-fill" data-action="stop-feed">Stop</button>' +
+        '</div>';
+      return;
+    }
+
+    if (editing && editing.mode === 'new' && editing.type === 'Breastfeed'){
+      el.className = 'row row-active row-active-gold';
+      el.innerHTML = renderFeedForm(editing);
+      return;
+    }
+
+    el.className = 'row';
+    var lastSide = getLastFeedSide();
+    el.innerHTML =
+      '<div><div class="row-label">Breastfeed</div><div class="row-hint">' + (lastSide ? 'Last was ' + lastSide.toLowerCase() : 'Choose a side') + '</div></div>' +
+      '<div class="row-actions-col">' +
+        '<div class="row-actions">' +
+          '<button class="chip' + (lastSide==='RIGHT'?' chip-suggested':'') + '" data-action="start-feed" data-side="LEFT">Left</button>' +
+          '<button class="chip' + (lastSide==='LEFT'?' chip-suggested':'') + '" data-action="start-feed" data-side="RIGHT">Right</button>' +
+        '</div>' +
+        '<button class="link-btn" data-action="open-new" data-type="Breastfeed">log manually</button>' +
+      '</div>';
+  }
+
+  function sideChip(field, value, d, label){
+    var selected = d[field] === value;
+    return '<button class="chip chip-select' + (selected?' selected':'') + '" data-side-field="' + field + '" data-side-value="' + value + '">' + label + '</button>';
+  }
+
+  function renderFeedForm(d){
+    return (
+      '<div class="row-label">Breastfeed' + (d.mode==='edit' ? '<span class="tag">edit</span>' : '<span class="tag">manual</span>') + '</div>' +
+      '<div class="form-field"><div class="form-label">Start</div><input type="datetime-local" class="time-input" style="width:100%" value="' + toLocalInputValue(d.startMs) + '" data-edit="startMs"></div>' +
+      '<div class="attr-group"><div class="attr-title">Began on</div><div class="chip-row">' + sideChip('beginSide','LEFT',d,'Left') + sideChip('beginSide','RIGHT',d,'Right') + '</div></div>' +
+      '<div class="attr-group"><div class="attr-title">Ended on</div><div class="chip-row">' + sideChip('endSide','LEFT',d,'Left') + sideChip('endSide','RIGHT',d,'Right') + '</div></div>' +
+      '<div class="form-grid">' +
+        '<div class="form-field"><div class="form-label">Left (min)</div><input type="number" min="0" inputmode="numeric" class="note-input" value="' + d.leftMin + '" data-edit="leftMin"></div>' +
+        '<div class="form-field"><div class="form-label">Right (min)</div><input type="number" min="0" inputmode="numeric" class="note-input" value="' + d.rightMin + '" data-edit="rightMin"></div>' +
+      '</div>' +
+      '<div class="form-field full"><div class="form-label">Note</div><input type="text" class="note-input" placeholder="optional" value="' + escapeHtml(d.note||'') + '" data-edit="note"></div>' +
+      formActions(d.mode)
+    );
+  }
+
+  function attrGroup(title, group, options, d){
+    return '<div class="attr-group"><div class="attr-title">' + title + '</div><div class="chip-row">' +
+      options.map(function(opt){
+        var selected = d[group] === opt;
+        return '<button class="chip chip-select' + (selected?' selected':'') + '" data-group="' + group + '" data-value="' + opt + '">' + opt + '</button>';
+      }).join('') +
+    '</div></div>';
+  }
+
+  function renderDiaperForm(d){
+    return (
+      '<div class="row-label">Diaper' + (d.mode==='edit' ? '<span class="tag">edit</span>' : '') + '</div>' +
+      '<div class="form-field"><div class="form-label">Time</div><input type="datetime-local" class="time-input" style="width:100%" value="' + toLocalInputValue(d.startMs) + '" data-edit="startMs"></div>' +
+      attrGroup('Type','diaperType',['Wet','Dirty','Dirty Wet'], d) +
+      attrGroup('Color','color',['Yellow','Green','Brown','Black','Red'], d) +
+      attrGroup('Texture','texture',['Seedy','Mushy','Runny','Watery','Hard'], d) +
+      attrGroup('Size','size',['Small','Medium','Large'], d) +
+      '<div class="form-field full"><div class="form-label">Note</div><input type="text" class="note-input" placeholder="optional" value="' + escapeHtml(d.note||'') + '" data-edit="note"></div>' +
+      formActions(d.mode, 'Log', !d.diaperType)
+    );
+  }
+
+  function renderEntryForm(d){
+    if (d.type === 'Sleep') return renderSleepForm(d);
+    if (d.type === 'Breastfeed') return renderFeedForm(d);
+    if (d.type === 'Diaper') return renderDiaperForm(d);
+    return '';
+  }
+
+  function renderDiaperRow(){
+    var el = document.getElementById('rowDiaper');
+    if (editing && editing.mode === 'new' && editing.type === 'Diaper'){
+      el.className = 'row row-active row-active-coral';
+      el.innerHTML = renderDiaperForm(editing);
+      return;
+    }
+    el.className = 'row';
+    el.innerHTML =
+      '<div><div class="row-label">Diaper</div><div class="row-hint">Tap to log</div></div>' +
+      '<button class="chip chip-ghost" data-action="open-new" data-type="Diaper">\uFF0B</button>';
+  }
+
+  // ---------- Rendering: recent ----------
+  function renderRecent(){
+    var cache = getCache();
+    var panel = document.getElementById('recentPanel');
+    if (cache.length === 0){ panel.innerHTML = '<div class="empty">Nothing logged yet.</div>'; return; }
     panel.innerHTML = cache.map(entryRowHtml).join('');
   }
 
   function entryRowHtml(e){
-    const type = e['Type'];
-    let dotClass = 'diaper', text = type, detail = '';
-    const startMs = Number(e['Start Date/time (Epoch)']) || Date.parse(e['Start Date/time']);
+    var key = e['_activityKey'];
+    if (editing && editing.mode === 'edit' && editing.activityKey === key){
+      return '<div class="entry-editing">' + renderEntryForm(editing) + '</div>';
+    }
+
+    var type = e['Type'];
+    var dotClass = 'diaper', text = type, detail = '';
+    var startMs = Number(e['Start Date/time (Epoch)']) || Date.parse(e['Start Date/time']);
 
     if (type === 'Sleep'){
-      dotClass = 'sleep';
-      const secs = Number(e['[Sleep] Duration (Seconds)']) || 0;
-      text = 'Sleep';
-      detail = formatDuration(secs);
+      dotClass = 'sleep'; text = 'Sleep';
+      detail = formatDuration(Number(e['[Sleep] Duration (Seconds)'])||0);
     } else if (type === 'Breastfeed'){
-      dotClass = 'feed';
-      const l = Number(e['[Breastfeed] Left Duration (Seconds)']) || 0;
-      const r = Number(e['[Breastfeed] Right Duration (Seconds)']) || 0;
-      text = 'Breastfeed';
-      const parts = [];
+      dotClass = 'feed'; text = 'Breastfeed';
+      var l = Number(e['[Breastfeed] Left Duration (Seconds)'])||0;
+      var r = Number(e['[Breastfeed] Right Duration (Seconds)'])||0;
+      var parts = [];
       if (l) parts.push('L ' + formatDuration(l));
       if (r) parts.push('R ' + formatDuration(r));
       detail = parts.join(' \u00b7 ');
     } else if (type === 'Diaper'){
-      dotClass = 'diaper';
-      text = 'Diaper';
+      dotClass = 'diaper'; text = 'Diaper';
       detail = e['[Diaper] Type'] || '';
     }
+    if (e['Note']) detail = detail ? detail + ' \u00b7 ' + e['Note'] : e['Note'];
 
-    return '<div class="entry">' +
-      '<div class="entry-main">' +
-        '<span class="dot ' + dotClass + '"></span>' +
-        '<div><div class="entry-text">' + text + '</div>' +
-        (detail ? '<div class="entry-detail">' + detail + '</div>' : '') +
-        '</div>' +
-      '</div>' +
+    return '<div class="entry" data-action="edit-entry" data-key="' + key + '">' +
+      '<div class="entry-main"><span class="dot ' + dotClass + '"></span>' +
+      '<div><div class="entry-text">' + text + '</div>' +
+      (detail ? '<div class="entry-detail">' + escapeHtml(detail) + '</div>' : '') +
+      '</div></div>' +
       '<div class="entry-time">' + formatRelative(startMs) + '</div>' +
     '</div>';
   }
 
-  let tickHandle = null;
-
-  function renderNow(){
-    const timer = getTimer();
-    const nowCard = document.getElementById('nowCard');
-    const idlePanel = document.getElementById('idlePanel');
-
-    if (!timer){
-      nowCard.classList.remove('show');
-      idlePanel.style.display = '';
-      if (tickHandle) { clearInterval(tickHandle); tickHandle = null; }
-      return;
-    }
-
-    idlePanel.style.display = 'none';
-    nowCard.classList.add('show');
-
-    function tick(){
-      if (timer.type === 'Sleep'){
-        const elapsed = (Date.now() - timer.startedAt) / 1000;
-        document.getElementById('nowLabel').innerHTML = '<b>Sleep</b> \u00b7 running';
-        document.getElementById('nowTimer').textContent = formatElapsed(elapsed);
-        document.getElementById('nowSub').textContent = 'Started ' + formatRelative(timer.startedAt);
-        document.getElementById('nowActions').innerHTML =
-          '<button class="btn btn-fill" data-action="stop-sleep">Stop</button>';
-      } else if (timer.type === 'Breastfeed'){
-        const currentElapsed = (Date.now() - timer.currentSideStart) / 1000;
-        const liveLeft = timer.currentSide === 'LEFT' ? timer.leftSeconds + currentElapsed : timer.leftSeconds;
-        const liveRight = timer.currentSide === 'RIGHT' ? timer.rightSeconds + currentElapsed : timer.rightSeconds;
-        document.getElementById('nowLabel').innerHTML = '<b>Breastfeed</b> \u00b7 ' + timer.currentSide.toLowerCase();
-        document.getElementById('nowTimer').textContent = formatElapsed(currentElapsed);
-        document.getElementById('nowSub').textContent =
-          'L ' + formatDuration(liveLeft) + ' \u00b7 R ' + formatDuration(liveRight);
-        const otherSide = timer.currentSide === 'LEFT' ? 'RIGHT' : 'LEFT';
-        document.getElementById('nowActions').innerHTML =
-          '<button class="btn btn-outline" data-action="switch-side" data-side="' + otherSide + '">Switch to ' + otherSide.toLowerCase() + '</button>' +
-          '<button class="btn btn-fill" data-action="stop-feed">Stop</button>';
-      }
-    }
-
-    tick();
-    if (tickHandle) clearInterval(tickHandle);
-    tickHandle = setInterval(tick, 1000);
+  // ---------- Rendering: summary ----------
+  function summaryLine(dotClass, label, count, detail){
+    return '<div class="summary-row"><div class="entry-main"><span class="dot ' + dotClass + '"></span>' +
+      '<div><div class="entry-text">' + label + '<span class="tag">' + count + '</span></div>' +
+      '<div class="entry-detail">' + detail + '</div></div></div></div>';
   }
 
-  // ---------- Actions ----------
+  function renderSummary(summary){
+    var el = document.getElementById('summaryBody');
+    if (!summary || (summary.sleep.count===0 && summary.breastfeed.count===0 && summary.diaper.count===0)){
+      el.innerHTML = '<div class="empty">Nothing logged in this window yet.</div>';
+      return;
+    }
+    var rows = [];
+    if (summary.sleep.count>0) rows.push(summaryLine('sleep','Sleep', summary.sleep.count, formatDuration(summary.sleep.totalSeconds) + ' total'));
+    if (summary.breastfeed.count>0) rows.push(summaryLine('feed','Breastfeed', summary.breastfeed.count,
+      formatDuration(summary.breastfeed.totalSeconds) + ' total \u00b7 L ' + formatDuration(summary.breastfeed.leftSeconds) + ' \u00b7 R ' + formatDuration(summary.breastfeed.rightSeconds)));
+    if (summary.diaper.count>0) rows.push(summaryLine('diaper','Diaper', summary.diaper.count, summary.diaper.wet + ' wet \u00b7 ' + summary.diaper.dirty + ' dirty'));
+    el.innerHTML = rows.join('');
+  }
+
+  // ---------- Timer actions ----------
   function startSleep(){
-    setTimer({ type: 'Sleep', startedAt: Date.now() });
-    renderNow();
+    var timers = getTimers();
+    timers.Sleep = { startedAt: Date.now() };
+    setTimers(timers);
+    renderSleepRow();
   }
 
   function stopSleep(){
-    const timer = getTimer();
-    if (!timer) return;
-    const endedAt = Date.now();
-    submitEntry({
-      "Type": "Sleep",
-      "Profile Name": CONFIG.PROFILE_NAME,
-      "Start Date/time": formatDateTime(timer.startedAt),
-      "Start Date/time (Epoch)": timer.startedAt,
-      "Created By Caregiver": CONFIG.CAREGIVER,
-      "Last Updated By Caregiver": CONFIG.CAREGIVER,
-      "Time Zone": CONFIG.TIMEZONE,
-      "[Sleep] Duration (Seconds)": Math.round((endedAt - timer.startedAt) / 1000),
-      "[Sleep] End Date/time": formatDateTime(endedAt),
-      "[Sleep] End Date/time (Epoch)": endedAt,
-      "_familyKey": "local",
-      "_profileKey": "local",
-      "_activityKey": uid()
-    });
-    setTimer(null);
-    renderNow();
+    var timers = getTimers();
+    var t = timers.Sleep;
+    if (!t) return;
+    var endedAt = Date.now();
+    var entry = {
+      "Type": "Sleep", "Profile Name": CONFIG.PROFILE_NAME,
+      "Start Date/time": formatDateTime(t.startedAt), "Start Date/time (Epoch)": t.startedAt,
+      "Created By Caregiver": CONFIG.CAREGIVER, "Last Updated By Caregiver": CONFIG.CAREGIVER,
+      "Time Zone": CONFIG.TIMEZONE, "Note": "",
+      "[Sleep] Duration (Seconds)": Math.round((endedAt - t.startedAt)/1000),
+      "[Sleep] End Date/time": formatDateTime(endedAt), "[Sleep] End Date/time (Epoch)": endedAt,
+      "_familyKey": "local", "_profileKey": "local", "_activityKey": uid()
+    };
+    addCacheEntry(entry);
+    queueOp(entry);
+    timers.Sleep = null;
+    setTimers(timers);
+    renderSleepRow(); renderRecent(); fetchSummary();
+  }
+
+  function setSleepStartLive(value){
+    var timers = getTimers();
+    if (!timers.Sleep) return;
+    timers.Sleep.startedAt = fromLocalInputValue(value);
+    setTimers(timers);
+    tickSleep();
   }
 
   function startFeed(side){
-    setTimer({
-      type: 'Breastfeed',
-      startedAt: Date.now(),
-      beginSide: side,
-      currentSide: side,
-      currentSideStart: Date.now(),
-      leftSeconds: 0,
-      rightSeconds: 0
-    });
-    renderNow();
+    var timers = getTimers();
+    timers.Breastfeed = { startedAt: Date.now(), beginSide: side, currentSide: side, currentSideStart: Date.now(), leftSeconds:0, rightSeconds:0 };
+    setTimers(timers);
+    renderFeedRow();
   }
 
   function switchSide(newSide){
-    const timer = getTimer();
-    if (!timer || timer.type !== 'Breastfeed') return;
-    const elapsed = (Date.now() - timer.currentSideStart) / 1000;
-    if (timer.currentSide === 'LEFT') timer.leftSeconds += elapsed;
-    else timer.rightSeconds += elapsed;
-    timer.currentSide = newSide;
-    timer.currentSideStart = Date.now();
-    setTimer(timer);
-    renderNow();
+    var timers = getTimers();
+    var t = timers.Breastfeed;
+    if (!t) return;
+    var elapsed = (Date.now() - t.currentSideStart)/1000;
+    if (t.currentSide === 'LEFT') t.leftSeconds += elapsed; else t.rightSeconds += elapsed;
+    t.currentSide = newSide;
+    t.currentSideStart = Date.now();
+    setTimers(timers);
+    renderFeedRow();
   }
 
   function stopFeed(){
-    const timer = getTimer();
-    if (!timer) return;
-    const elapsed = (Date.now() - timer.currentSideStart) / 1000;
-    if (timer.currentSide === 'LEFT') timer.leftSeconds += elapsed;
-    else timer.rightSeconds += elapsed;
-
-    submitEntry({
-      "Type": "Breastfeed",
-      "Profile Name": CONFIG.PROFILE_NAME,
-      "Start Date/time": formatDateTime(timer.startedAt),
-      "Start Date/time (Epoch)": timer.startedAt,
-      "Created By Caregiver": CONFIG.CAREGIVER,
-      "Last Updated By Caregiver": CONFIG.CAREGIVER,
-      "Time Zone": CONFIG.TIMEZONE,
-      "[Breastfeed] Begin Side": timer.beginSide,
-      "[Breastfeed] End Side": timer.currentSide,
-      "[Breastfeed] Left Duration (Seconds)": Math.round(timer.leftSeconds),
-      "[Breastfeed] Right Duration (Seconds)": Math.round(timer.rightSeconds),
-      "_familyKey": "local",
-      "_profileKey": "local",
-      "_activityKey": uid()
-    });
-    setTimer(null);
-    renderNow();
+    var timers = getTimers();
+    var t = timers.Breastfeed;
+    if (!t) return;
+    var elapsed = (Date.now() - t.currentSideStart)/1000;
+    if (t.currentSide === 'LEFT') t.leftSeconds += elapsed; else t.rightSeconds += elapsed;
+    var entry = {
+      "Type": "Breastfeed", "Profile Name": CONFIG.PROFILE_NAME,
+      "Start Date/time": formatDateTime(t.startedAt), "Start Date/time (Epoch)": t.startedAt,
+      "Created By Caregiver": CONFIG.CAREGIVER, "Last Updated By Caregiver": CONFIG.CAREGIVER,
+      "Time Zone": CONFIG.TIMEZONE, "Note": "",
+      "[Breastfeed] Begin Side": t.beginSide, "[Breastfeed] End Side": t.currentSide,
+      "[Breastfeed] Left Duration (Seconds)": Math.round(t.leftSeconds),
+      "[Breastfeed] Right Duration (Seconds)": Math.round(t.rightSeconds),
+      "_familyKey": "local", "_profileKey": "local", "_activityKey": uid()
+    };
+    addCacheEntry(entry);
+    queueOp(entry);
+    timers.Breastfeed = null;
+    setTimers(timers);
+    renderFeedRow(); renderRecent(); fetchSummary();
   }
 
-  function logDiaper(type){
-    const now = Date.now();
-    submitEntry({
-      "Type": "Diaper",
-      "Profile Name": CONFIG.PROFILE_NAME,
-      "Start Date/time": formatDateTime(now),
-      "Start Date/time (Epoch)": now,
-      "Created By Caregiver": CONFIG.CAREGIVER,
-      "Last Updated By Caregiver": CONFIG.CAREGIVER,
-      "Time Zone": CONFIG.TIMEZONE,
-      "[Diaper] Type": type,
-      "_familyKey": "local",
-      "_profileKey": "local",
-      "_activityKey": uid()
-    });
+  function setFeedStartLive(value){
+    var timers = getTimers();
+    var t = timers.Breastfeed;
+    if (!t) return;
+    var newStart = fromLocalInputValue(value);
+    var delta = newStart - t.startedAt;
+    t.startedAt = newStart;
+    t.currentSideStart += delta;
+    setTimers(timers);
+    tickFeed();
+  }
+
+  // ---------- Manual add / edit / delete ----------
+  function openNew(type){
+    var now = Date.now();
+    editing = { mode: 'new', type: type, activityKey: null, note: '' };
+    if (type === 'Sleep'){
+      editing.startMs = now - 15*60000; editing.endMs = now;
+    } else if (type === 'Breastfeed'){
+      editing.startMs = now - 10*60000;
+      editing.beginSide = 'LEFT'; editing.endSide = 'LEFT';
+      editing.leftMin = 10; editing.rightMin = 0;
+    } else if (type === 'Diaper'){
+      editing.startMs = now;
+      editing.diaperType = null; editing.color = null; editing.texture = null; editing.size = null;
+    }
+    renderRows();
+  }
+
+  function openEdit(entry){
+    var type = entry['Type'];
+    var startMs = Number(entry['Start Date/time (Epoch)']) || Date.parse(entry['Start Date/time']);
+    editing = { mode: 'edit', type: type, activityKey: entry['_activityKey'], note: entry['Note']||'', startMs: startMs };
+    if (type === 'Sleep'){
+      editing.endMs = Number(entry['[Sleep] End Date/time (Epoch)']) || (startMs + (Number(entry['[Sleep] Duration (Seconds)'])||0)*1000);
+    } else if (type === 'Breastfeed'){
+      editing.beginSide = entry['[Breastfeed] Begin Side'] || 'LEFT';
+      editing.endSide = entry['[Breastfeed] End Side'] || editing.beginSide;
+      editing.leftMin = Math.round((Number(entry['[Breastfeed] Left Duration (Seconds)'])||0)/60);
+      editing.rightMin = Math.round((Number(entry['[Breastfeed] Right Duration (Seconds)'])||0)/60);
+    } else if (type === 'Diaper'){
+      editing.diaperType = entry['[Diaper] Type'] || null;
+      editing.color = entry['[Diaper] Dirty Color'] || null;
+      editing.texture = entry['[Diaper] Dirty Texture'] || null;
+      editing.size = entry['[Diaper] Detail'] || null;
+    }
+    renderRecent();
+  }
+
+  function cancelEdit(){
+    editing = null;
+    renderRows(); renderRecent();
+  }
+
+  function buildPayloadFromEditing(d){
+    var base = {
+      "Type": d.type, "Profile Name": CONFIG.PROFILE_NAME,
+      "Start Date/time": formatDateTime(d.startMs), "Start Date/time (Epoch)": d.startMs,
+      "Created By Caregiver": CONFIG.CAREGIVER, "Last Updated By Caregiver": CONFIG.CAREGIVER,
+      "Time Zone": CONFIG.TIMEZONE, "Note": d.note || ""
+    };
+    if (d.type === 'Sleep'){
+      base["[Sleep] Duration (Seconds)"] = Math.max(0, Math.round((d.endMs - d.startMs)/1000));
+      base["[Sleep] End Date/time"] = formatDateTime(d.endMs);
+      base["[Sleep] End Date/time (Epoch)"] = d.endMs;
+    } else if (d.type === 'Breastfeed'){
+      base["[Breastfeed] Begin Side"] = d.beginSide;
+      base["[Breastfeed] End Side"] = d.endSide;
+      base["[Breastfeed] Left Duration (Seconds)"] = Math.max(0, Math.round((Number(d.leftMin)||0)*60));
+      base["[Breastfeed] Right Duration (Seconds)"] = Math.max(0, Math.round((Number(d.rightMin)||0)*60));
+    } else if (d.type === 'Diaper'){
+      base["[Diaper] Type"] = d.diaperType;
+      base["[Diaper] Dirty Color"] = d.color || "";
+      base["[Diaper] Dirty Texture"] = d.texture || "";
+      base["[Diaper] Detail"] = d.size || "";
+    }
+    return base;
+  }
+
+  function saveEntry(){
+    if (!editing) return;
+    if (editing.type === 'Diaper' && !editing.diaperType) return;
+    var payload = buildPayloadFromEditing(editing);
+    if (editing.mode === 'edit'){
+      payload['_op'] = 'update';
+      payload['_activityKey'] = editing.activityKey;
+      updateCacheEntry(editing.activityKey, payload);
+    } else {
+      payload['_activityKey'] = uid();
+      payload['_familyKey'] = 'local';
+      payload['_profileKey'] = 'local';
+      addCacheEntry(payload);
+    }
+    queueOp(payload);
+    editing = null;
+    renderRows(); renderRecent(); fetchSummary();
+  }
+
+  function deleteEntry(){
+    if (!editing || editing.mode !== 'edit') return;
+    if (!confirm('Delete this entry?')) return;
+    var key = editing.activityKey;
+    queueOp({ _op: 'delete', _activityKey: key });
+    removeCacheEntry(key);
+    editing = null;
+    renderRows(); renderRecent(); fetchSummary();
+  }
+
+  // ---------- Ticking (running timers only touch text nodes) ----------
+  function tickSleep(){
+    var t = getTimers().Sleep;
+    var el = document.getElementById('sleepTimerText');
+    if (t && el) el.textContent = formatElapsed((Date.now()-t.startedAt)/1000);
+  }
+  function tickFeed(){
+    var t = getTimers().Breastfeed;
+    var elText = document.getElementById('feedTimerText');
+    var elSub = document.getElementById('feedSubText');
+    if (t && elText){
+      var currentElapsed = (Date.now() - t.currentSideStart)/1000;
+      elText.textContent = formatElapsed(currentElapsed);
+      if (elSub) elSub.textContent = feedSubLabel(t);
+    }
   }
 
   // ---------- Event wiring ----------
   document.addEventListener('click', function(e){
-    const btn = e.target.closest('[data-action]');
+    var groupChip = e.target.closest('[data-group]');
+    if (groupChip && editing){
+      var group = groupChip.dataset.group, value = groupChip.dataset.value;
+      editing[group] = (editing[group] === value) ? null : value;
+      if (editing.mode === 'new') renderRows(); else renderRecent();
+      return;
+    }
+    var sideChipEl = e.target.closest('[data-side-field]');
+    if (sideChipEl && editing){
+      editing[sideChipEl.dataset.sideField] = sideChipEl.dataset.sideValue;
+      if (editing.mode === 'new') renderRows(); else renderRecent();
+      return;
+    }
+    var tab = e.target.closest('.tab-btn');
+    if (tab){
+      currentSummaryRange = tab.dataset.range;
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.toggle('active', b===tab); });
+      var cached = localStorage.getItem('jujube_summary_' + currentSummaryRange);
+      if (cached) renderSummary(JSON.parse(cached));
+      fetchSummary();
+      return;
+    }
+    var btn = e.target.closest('[data-action]');
     if (!btn) return;
-    const action = btn.dataset.action;
+    var action = btn.dataset.action;
     if (action === 'start-sleep') startSleep();
     else if (action === 'stop-sleep') stopSleep();
     else if (action === 'start-feed') startFeed(btn.dataset.side);
     else if (action === 'switch-side') switchSide(btn.dataset.side);
     else if (action === 'stop-feed') stopFeed();
-    else if (action === 'log-diaper') logDiaper(btn.dataset.type);
+    else if (action === 'open-new') openNew(btn.dataset.type);
+    else if (action === 'edit-entry'){
+      var key = btn.dataset.key;
+      var entry = getCache().filter(function(x){ return x['_activityKey']===key; })[0];
+      if (entry) openEdit(entry);
+    }
+    else if (action === 'cancel-edit') cancelEdit();
+    else if (action === 'save-entry') saveEntry();
+    else if (action === 'delete-entry') deleteEntry();
+  });
+
+  function onEditFieldChange(e){
+    var field = e.target.dataset && e.target.dataset.edit;
+    if (field && editing){
+      if (field === 'startMs' || field === 'endMs') editing[field] = fromLocalInputValue(e.target.value);
+      else editing[field] = e.target.value;
+      return;
+    }
+    var live = e.target.dataset && e.target.dataset.editLive;
+    if (live === 'sleep-start') setSleepStartLive(e.target.value);
+    else if (live === 'feed-start') setFeedStartLive(e.target.value);
+  }
+  document.addEventListener('change', onEditFieldChange);
+  document.addEventListener('input', function(e){
+    var field = e.target.dataset && e.target.dataset.edit;
+    if (field === 'note' || field === 'leftMin' || field === 'rightMin') onEditFieldChange(e);
   });
 
   window.addEventListener('online', flushPending);
   document.addEventListener('visibilitychange', function(){
     if (document.visibilityState === 'visible'){
-      renderNow();
-      flushPending();
-      fetchRecent();
+      renderRows(); flushPending(); fetchRecent(); fetchSummary();
     }
   });
 
   // ---------- Init ----------
-  renderAge();
+  document.getElementById('age').textContent = computeAge(CONFIG.BIRTH_DATE);
   renderRecent();
-  renderNow();
+  renderRows();
   fetchRecent();
+  fetchSummary();
   updateSyncNote();
   flushPending();
+  setInterval(function(){ tickSleep(); tickFeed(); }, 1000);
 
 })();
 </script>
